@@ -21,7 +21,6 @@ async def upload_file(file: UploadFile = File(...)):
     with file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # ✅ Extract structured content once and save it
     structured_data = preprocess_text(file_path)
     
     processed_file_path = PROCESSED_FOLDER / f"{file.filename}.json"
