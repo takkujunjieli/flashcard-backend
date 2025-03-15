@@ -1,6 +1,6 @@
 # app/api/__init__.py
 from fastapi import APIRouter
-from app.api.endpoints import upload, flashcards, inference
+from api.endpoints import upload, flashcards, inference
 
 api_router = APIRouter()
 api_router.include_router(upload.router, prefix="/upload", tags=["Upload"])

@@ -17,4 +17,3 @@ async def generate_flashcards(file: UploadFile = File(...)):
     flashcards = efficient_flashcard_generation(file_path)
     
     return {"flashcards": flashcards}
-

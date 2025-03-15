@@ -8,22 +8,22 @@ router = APIRouter()
 async def get_flashcards():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, section, question, answer, terminology, keywords FROM flashcards")
+    cursor.execute("SELECT id, question, answer, terminology, keywords FROM flashcards")
     rows = cursor.fetchall()
     conn.close()
 
-    flashcards = [{"id": r[0], "section": r[1], "question": r[2], "answer": r[3], "terminology": r[4].split(","), "keywords": r[5].split(",")} for r in rows]
+    flashcards = [{"id": r["id"], "question": r["question"], "answer": r["answer"], "terminology": r["terminology"].split(","), "keywords": r["keywords"].split(",")} for r in rows]
     return {"flashcards": flashcards}
 
 @router.get("/flashcards/search/")
 async def search_flashcards(term: str):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, section, question, answer, terminology, keywords FROM flashcards WHERE terminology LIKE ? OR keywords LIKE ?", (f"%{term}%", f"%{term}%"))
+    cursor.execute("SELECT id, question, answer, terminology, keywords FROM flashcards WHERE terminology LIKE ? OR keywords LIKE ?", (f"%{term}%", f"%{term}%"))
     rows = cursor.fetchall()
     conn.close()
 
-    flashcards = [{"id": r[0], "section": r[1], "question": r[2], "answer": r[3], "terminology": r[4].split(","), "keywords": r[5].split(",")} for r in rows]
+    flashcards = [{"id": r["id"], "question": r["question"], "answer": r["answer"], "terminology": r["terminology"].split(","), "keywords": r["keywords"].split(",")} for r in rows]
     return {"flashcards": flashcards}
 
 @router.delete("/flashcards/{flashcard_id}")
