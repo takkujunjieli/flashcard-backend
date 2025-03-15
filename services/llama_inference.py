@@ -31,7 +31,7 @@ def cleanup_json_file(filename):
     Deletes the processed JSON file after flashcards have been generated successfully.
     """
     processed_file_path = PROCESSED_FOLDER / f"{filename}.json"
-    
+
     if processed_file_path.exists():
         try:
             os.remove(processed_file_path)
@@ -46,7 +46,7 @@ def efficient_flashcard_generation(filename):
     Implements a fallback mechanism to prevent JSON deletion if generation fails.
     """
     processed_file_path = PROCESSED_FOLDER / f"{filename}.json"
-    
+
     if not processed_file_path.exists():
         return {"error": "Processed file not found. Please upload again."}
 
@@ -58,14 +58,32 @@ def efficient_flashcard_generation(filename):
         flashcards = []
         for section in structured_text:
             prompt = f"""
-            You are a professional lecturer. Your task is to help students memorize the content by generating Q&A pairs.
-            Each Q&A pair should address one keyword from the content. Ensure that both the question and answer are concise,
-            with a word limit of less than 30 words each.
+            You are an AI assistant that generates flashcards from uploaded documents. Your task is to extract key concepts, summarize them into questions and answers, and present them as flashcards. 
 
-            Section: {section['section_title']}
-            Content: {', '.join(section['content'])}
+            ### Instructions:
+            1. **Extract 10 key concepts** from the document. Choose concepts that are important, fundamental, or commonly tested.
+            2. **Generate a question and an answer** for each concept:
+            - The **question** should be concise but meaningful (max **100 words**).
+            - The **answer** should be informative and accurate (max **100 words**).
+            - Both should be clear, direct, and focused on learning.
+            3. **Avoid vague or overly general questions**. Ensure the questions test understanding rather than just recalling definitions.
+            4. **Maintain a structured output format** for easy processing.
 
-            Generate 3 question-answer pairs relevant to the content.
+            ### **Output Format (JSON)**
+            ```json
+            {
+            "flashcards": [
+                {
+                "question": "What is [concept] and why is it important?",
+                "answer": "[Concise explanation of concept within 100 words.]"
+                },
+                {
+                "question": "How does [concept] work in [context]?",
+                "answer": "[Detailed yet concise answer within 100 words.]"
+                },
+                ...
+            ]
+            }
             """
 
             response = run_llama3_inference(prompt)
@@ -79,17 +97,19 @@ def efficient_flashcard_generation(filename):
                 if "Q:" in qa and "A:" in qa:
                     question = qa.split("Q:")[1].strip()
                     answer = qa.split("A:")[1].strip()
-                    keywords = section.get('keywords', [])
-                    terminology = section.get('terminology', [])
+                    keywords = section.get("keywords", [])
+                    terminology = section.get("terminology", [])
 
                     save_flashcard(question, answer, terminology, keywords)
 
-                    flashcards.append({
-                        "question": question,
-                        "answer": answer,
-                        "terminology": terminology,
-                        "keywords": keywords
-                    })
+                    flashcards.append(
+                        {
+                            "question": question,
+                            "answer": answer,
+                            "terminology": terminology,
+                            "keywords": keywords,
+                        }
+                    )
 
         # If everything was successful, delete the JSON file
         cleanup_json_file(filename)
