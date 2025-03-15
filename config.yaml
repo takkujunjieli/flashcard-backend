@@ -1,0 +1,3 @@
+api_key: "2Y2X4FD-6WBM83K-KMQJ6KA-M1FHDHJ"
+model_server_base_url: "http://localhost:3001/api/v1"
+workspace_slug: "flashcard"

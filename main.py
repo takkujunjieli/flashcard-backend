@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.api.endpoints import upload, flashcards, inference
-from app.core.database import init_db
+from api.endpoints import upload, flashcards, inference
+from core.database import init_db
 
 app = FastAPI()
 

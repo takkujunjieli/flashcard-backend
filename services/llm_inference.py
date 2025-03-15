@@ -1,30 +1,41 @@
 import json
-import subprocess
-import os
+import requests
 from pathlib import Path
+import yaml
 from core.database import save_flashcard
 
-GENIE_PATH = "/path/to/genie"
-MODEL_PATH = "/path/to/llama3.qnn"
+# Load configuration
+with open("config.yaml", "r") as config_file:
+    config = yaml.safe_load(config_file)
+
+API_KEY = config["api_key"]
+MODEL_SERVER_BASE_URL = config["model_server_base_url"]
 
 PROCESSED_FOLDER = Path("./processed")  # Path where structured JSON is stored
 
-
 def run_llama3_inference(prompt):
     """
-    Runs on-device inference using Genie and the compiled QNN model.
+    Runs inference using the AnythingLLM API.
     """
-    command = [GENIE_PATH, "--model", MODEL_PATH, "--input", prompt]
+    #self.chat_url = f"{self.base_url}/workspace/{self.workspace_slug}/chat"
+    url = f"{MODEL_SERVER_BASE_URL}/inference"
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "prompt": prompt
+    }
 
     try:
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-        output = json.loads(result.stdout)
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        output = response.json()
         return output.get("generated_text", "")
+    except requests.exceptions.RequestException as e:
+        return f"AnythingLLM API request failed: {str(e)}"
     except json.JSONDecodeError:
         return "Error in inference output."
-    except subprocess.CalledProcessError as e:
-        return f"Genie inference failed: {e.stderr}"
-
 
 def cleanup_json_file(filename):
     """
@@ -38,7 +49,6 @@ def cleanup_json_file(filename):
             print(f"Deleted old JSON file: {processed_file_path}")
         except Exception as e:
             print(f"Error deleting JSON file: {processed_file_path} - {str(e)}")
-
 
 def efficient_flashcard_generation(filename):
     """
