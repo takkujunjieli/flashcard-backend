@@ -1,18 +1,27 @@
 import subprocess
 import json
-
 from services.text_processing import preprocess_text
-from core.database import save_flashcard  # Import the save_flashcard function
+from core.database import save_flashcard
+
+GENIE_PATH = "/path/to/genie"  # Update with actual Genie executable path
+MODEL_PATH = "/path/to/llama3.qnn"  # Update with actual compiled QNN model
 
 def run_llama3_inference(prompt):
-    command = f"./genie --model llama3.qnn --input '{prompt}'"
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    
+    """
+    Runs on-device inference using Genie and the compiled QNN model.
+    """
+    command = [GENIE_PATH, "--model", MODEL_PATH, "--input", prompt]
+
     try:
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
         output = json.loads(result.stdout)
         return output.get("generated_text", "")
     except json.JSONDecodeError:
         return "Error in inference output."
+    except subprocess.CalledProcessError as e:
+        return f"Genie inference failed: {e.stderr}"
+    
+
 
 def efficient_flashcard_generation(pdf_path):
     """
@@ -25,9 +34,13 @@ def efficient_flashcard_generation(pdf_path):
     for section in structured_text:
         # Step 2: Format optimized prompt for Llama 3
         prompt = f"""
+        You are a professional lecturer. Your task is to help students memorize the content by generating Q&A pairs.
+        Each Q&A pair should address one keyword from the content. Ensure that both the question and answer are concise,
+        with a word limit of less than 30 words each.
+
         Section: {section['section_title']}
         Content: {', '.join(section['content'])}
-        
+
         Generate 3 question-answer pairs relevant to the content.
         """
 
