@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env
+*.env
+
+# FastAPI and Python logs
+logs/
+*.log
+debug.log
+
+# SQLite database files
+flashcards.db
+
+# Uploaded and processed files
+uploads/
+processed/
+
+# Model-related files
+/path/to/genie
+/path/to/llama3.qnn
+
+# PyMuPDF and SpaCy models
+spacy_data/
