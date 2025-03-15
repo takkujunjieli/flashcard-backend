@@ -14,19 +14,20 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS flashcards (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            section TEXT,
             question TEXT,
             answer TEXT,
-            terminology TEXT
+            terminology TEXT,
+            keywords TEXT
+                   
         )
     """)
     conn.commit()
     conn.close()
 
-def save_flashcard(section, question, answer, terminology):
+def save_flashcard(question, answer, terminology, keywords):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO flashcards (section, question, answer, terminology) VALUES (?, ?, ?, ?)", 
-                   (section, question, answer, ",".join(terminology)))
+    cursor.execute("INSERT INTO flashcards (question, answer, terminology, keywords) VALUES (?, ?, ?, ?)", 
+                   (question, answer, ",".join(terminology), ",".join(keywords)))
     conn.commit()
     conn.close()

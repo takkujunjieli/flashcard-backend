@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File
 import shutil
 from pathlib import Path
-from app.services.text_processing import extract_text
+from services.text_processing import extract_text
 
 router = APIRouter()
 
