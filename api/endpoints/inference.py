@@ -9,6 +9,7 @@ router = APIRouter()
 
 class FlashcardRequest(BaseModel):
     filename: str
+    userPrompt: str
 
 
 @router.post("/generate_flashcards/", response_model=list[Flashcard])
@@ -17,8 +18,10 @@ async def generate_flashcards(request: FlashcardRequest):
     Generates flashcards using the pre-processed text file.
     """
     try:
-
-        flashcards = efficient_flashcard_generation(request.filename)
+        userPrompt = request.userPrompt
+        print(f"User prompt: {userPrompt}")
+        flashcards = efficient_flashcard_generation(
+            request.filename, userPrompt)
 
         # Check if there was an error in flashcard generation
         if "error" in flashcards:
@@ -49,4 +52,5 @@ async def generate_flashcards(request: FlashcardRequest):
         # Log the error (you can use logging module for more advanced logging)
         print(f"Error generating flashcards: {e}")
         # Raise an HTTPException with a detailed error message
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Internal Server Error: {e}")

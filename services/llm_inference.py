@@ -59,7 +59,7 @@ def cleanup_json_file(filename):
                 f"Error deleting JSON file: {processed_file_path} - {str(e)}")
 
 
-def efficient_flashcard_generation(filename):
+def efficient_flashcard_generation(filename, userPrompt):
     """
     Generates flashcards using pre-extracted structured text.
     Implements a fallback mechanism to prevent JSON deletion if generation fails.
@@ -84,7 +84,7 @@ def efficient_flashcard_generation(filename):
             Section: {section['section_title']}
             Content: {', '.join(section['content'])}
 
-            Generate 3 question-answer pairs relevant to the content.
+            {userPrompt}
             """
 
             response = run_llama3_inference(prompt)
