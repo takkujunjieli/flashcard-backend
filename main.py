@@ -8,11 +8,12 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow frontend origin
+    allow_origins=["http://localhost:5174"],  # Allow frontend origin
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
+
 
 # Include the routers
 app.include_router(inference.router, prefix="/api")

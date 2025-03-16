@@ -9,8 +9,8 @@
 
 ### Frontend
 
-- [ ] Call /upload -> make sure pdf files can be uploaded (backend doesn't support multipel pdf uploads)
-- [ ] Call /generate-flashcards -> make sure answer and question pairs are presented on flashcards
+- [x] Call /upload -> make sure pdf files can be uploaded (backend doesn't support multipel pdf uploads)
+- [x] Call /generate-flashcards -> make sure answer and question pairs are presented on flashcards
 
 ### Other
 

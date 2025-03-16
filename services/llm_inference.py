@@ -59,6 +59,27 @@ def cleanup_json_file(filename):
                 f"Error deleting JSON file: {processed_file_path} - {str(e)}")
 
 
+def generate_base_prompt(userPrompt):
+    """
+    Adjusts the first sentence of the prompt based on keyword conditions.
+    """
+    lower_prompt = userPrompt.lower()
+
+    if "students" in lower_prompt:
+        if "review" in lower_prompt:
+            return "You are a professional lecturer. Your task is to help the student (user) memorize the content by generating Q&A pairs."
+        if "interview" in lower_prompt:
+            return "Your task is to help students interview by generating Q&A pairs."
+
+    if "interviewee" in lower_prompt:
+        if "interview" in lower_prompt:
+            return "Your task is to help interviewees interview using Q&A pairs."
+        if "review" in lower_prompt:
+            return "Your task is to help interviewees memorize the content using Q&A pairs."
+
+    return "You are a professional lecturer. Your task is to help memorize the content by generating Q&A pairs."
+
+
 def efficient_flashcard_generation(filename, userPrompt):
     """
     Generates flashcards using pre-extracted structured text.
@@ -74,10 +95,12 @@ def efficient_flashcard_generation(filename, userPrompt):
         with open(processed_file_path, "r", encoding="utf-8") as f:
             structured_text = json.load(f)
 
+        first_sentence = generate_base_prompt(userPrompt)
+
         flashcards = []
         for section in structured_text:
             prompt = f"""
-            You are a professional lecturer. Your task is to help students memorize the content by generating Q&A pairs.
+            {first_sentence}
             Each Q&A pair should address one keyword from the content. Ensure that both the question and answer are concise,
             with a word limit of less than 30 words each.
 
