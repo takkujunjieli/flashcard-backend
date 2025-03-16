@@ -2,7 +2,7 @@ import requests
 
 # Step 1: Upload the PDF file
 upload_url = "http://127.0.0.1:1111/api/upload/"
-files = {'file': open('MMT.pdf', 'rb')}
+files = {'file': open('stock.pdf', 'rb')}
 upload_response = requests.post(upload_url, files=files)
 
 # Print the raw response text for debugging
@@ -18,8 +18,9 @@ except requests.exceptions.JSONDecodeError:
 
 # Step 2: Generate flashcards using the uploaded file
 generate_flashcards_url = "http://127.0.0.1:1111/api/generate_flashcards/"
-payload = {"filename": "MMT.pdf"}
+payload = {"filename": "stock.pdf"}
 
+print(f"Sending request to generate flashcards for file: {payload['filename']}")
 generate_response = requests.post(generate_flashcards_url, json=payload)
 
 # Print the raw response text for debugging
