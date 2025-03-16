@@ -17,11 +17,11 @@ def run_llama3_inference(prompt):
     """
     Runs inference using the AnythingLLM API.
     """
-    #self.chat_url = f"{self.base_url}/workspace/{self.workspace_slug}/chat"
     url = f"{MODEL_SERVER_BASE_URL}/inference"
     headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + API_KEY
     }
     payload = {
         "prompt": prompt
@@ -100,6 +100,9 @@ def efficient_flashcard_generation(filename):
                         "terminology": terminology,
                         "keywords": keywords
                     })
+
+        # Print the generated flashcards for debugging
+        print("Generated flashcards:", flashcards)
 
         # If everything was successful, delete the JSON file
         cleanup_json_file(filename)
