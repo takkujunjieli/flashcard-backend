@@ -106,9 +106,12 @@ def efficient_flashcard_generation(filename, userPrompt):
             keywords: {section.get('keywords', [])}
             terminology: {section.get('terminology', [])}
 
+            Strictly using the following format:
+            Q: this is a question
+            A: this is the answer
 
             Each Q&A pair should address one keyword from the content. Ensure that both the question and answer are concise,
-            with a word limit of less than 30 words each.
+            with a word limit of less than 30 words each. Do not bold the qusetion, and do not number the pairs
 
             {userPrompt}
             """

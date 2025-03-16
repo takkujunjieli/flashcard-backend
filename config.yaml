@@ -1,3 +1,3 @@
-api_key: 'S9QBKDM-G2X4M8J-KH9RQH2-9K9HZ5M'
+api_key: '2Y2X4FD-6WBM83K-KMQJ6KA-M1FHDHJ'
 model_server_base_url: 'http://localhost:3001/api/v1'
-workspace_slug: 'flashcards'
+workspace_slug: 'flashcard'
