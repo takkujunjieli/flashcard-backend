@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from services.llm_inference import efficient_flashcard_generation
+from services.llm_inference import efficient_definition_generation
 # from core.database import get_db_connection
 from models.flashcard import Flashcard
 
@@ -12,38 +12,36 @@ class FlashcardRequest(BaseModel):
     userPrompt: str
 
 
-@router.post("/generate_flashcards/", response_model=list[Flashcard])
-async def generate_flashcards(request: FlashcardRequest):
+@router.post("/generate_definitions/", response_model=list[Flashcard])
+async def generate_definitions(request: FlashcardRequest):
     """
     Generates flashcards using the pre-processed text file.
     """
     try:
-        userPrompt = request.userPrompt
-        print(f"User prompt: {userPrompt}")
-        flashcards = efficient_flashcard_generation(
-            request.filename, userPrompt)
+        terminology = request.terminology
+        definitions = efficient_definition_generation(
+            request.filename, terminology)
 
         # Check if there was an error in flashcard generation
-        if "error" in flashcards:
-            raise HTTPException(status_code=500, detail=flashcards["error"])
+        if "error" in definitions:
+            raise HTTPException(status_code=500, detail=definitions["error"])
 
         # Convert flashcards to the Flashcard model format
         flashcards_model = [
             Flashcard(
                 id=index,  # Increment ID dynamically
-                question=flashcard["question"],
-                answer=flashcard["answer"],
-                terminology=flashcard["terminology"],
-                keywords=flashcard["keywords"]
+                question=definitions["definition"],
+                answer=definitions["extension"],
+                terminology=[],
+                keywords=[]
             )
-            for index, flashcard in enumerate(flashcards)
-            # Enumerate to track index
+            for index, definitions in enumerate(definitions)
         ]
 
         return flashcards_model
     except Exception as e:
         # Log the error (you can use logging module for more advanced logging)
-        print(f"Error generating flashcards: {e}")
+        print(f"Error generating definitions: {e}")
         # Raise an HTTPException with a detailed error message
         raise HTTPException(
             status_code=500, detail=f"Internal Server Error: {e}")

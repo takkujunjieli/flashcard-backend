@@ -153,3 +153,64 @@ def efficient_flashcard_generation(filename, userPrompt):
     except Exception as e:
         print(f"Error generating flashcards: {str(e)}")
         return {"error": f"Flashcard generation failed: {str(e)}"}
+
+def efficient_definition_generation(filename, terminology):
+    """
+    Generates definitions and extensions for the given terminology using pre-extracted structured text.
+    Implements a fallback mechanism to prevent JSON deletion if generation fails.
+    """
+    processed_file_path = PROCESSED_FOLDER / f"{filename}.json"
+
+    if not processed_file_path.exists():
+        return {"error": "Processed file not found. Please upload again."}
+
+    try:
+        # Read structured data instead of re-extracting
+        with open(processed_file_path, "r", encoding="utf-8") as f:
+            structured_text = json.load(f)
+
+        definitions = []
+        prompt = f"""
+        You are a professional lecturer. Your task is to provide a clear and concise definition and extension for the following term:
+        Term: {terminology}
+
+        Definition:
+        Extension:
+        """
+
+        response = run_llama3_inference(prompt)
+        print(f"response: {response}")
+
+        if "Error" in response or "Genie inference failed" in response:
+            raise RuntimeError(f"Inference failed: {response}")
+
+        # Parse and store definitions and extensions
+        lines = response.split("\n")
+        definition = None
+        extension = None
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith("Definition:"):
+                definition = line[len("Definition:"):].strip()
+            elif line.startswith("Extension:"):
+                extension = line[len("Extension:"):].strip()
+
+        if definition and extension:
+            definitions.append({
+                "term": terminology,
+                "definition": definition,
+                "extension": extension
+            })
+
+        # Print the generated definitions for debugging
+        print("Generated definitions:", definitions)
+
+        # If everything was successful, delete the JSON file
+        cleanup_json_file(filename)
+
+        return definitions
+
+    except Exception as e:
+        print(f"Error generating definitions: {str(e)}")
+        return {"error": f"Definition generation failed: {str(e)}"}
