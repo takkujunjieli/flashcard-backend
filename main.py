@@ -4,14 +4,20 @@ from api.endpoints import inference, flashcards, upload
 import uvicorn
 
 app = FastAPI()
+# Allow localhost and 127.0.0.1
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # List of allowed origins
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # List of allowed methods
-    allow_headers=["*"],  # List of allowed headers
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Include the routers
@@ -30,4 +36,4 @@ def read_root():
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="127.0.0.1", port=1111)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
