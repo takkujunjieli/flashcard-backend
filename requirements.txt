@@ -1,0 +1,10 @@
+pytest
+fastapi
+httpx
+pymupdf
+nltk
+spacy
+keybert
+python-multipart==0.0.20
+PyPDF2
+uvicorn

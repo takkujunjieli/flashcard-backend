@@ -11,6 +11,7 @@ UPLOAD_FOLDER.mkdir(exist_ok=True)
 PROCESSED_FOLDER = Path("./processed")  # New folder to store structured text
 PROCESSED_FOLDER.mkdir(exist_ok=True)
 
+
 @router.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     """
@@ -25,15 +26,18 @@ async def upload_file(file: UploadFile = File(...)):
         print(f"File uploaded successfully: {file_path}")
 
         structured_data = preprocess_text(file_path)
-        
+
         processed_file_path = PROCESSED_FOLDER / f"{file.filename}.json"
         with open(processed_file_path, "w", encoding="utf-8") as f:
             json.dump(structured_data, f)
 
         print(f"Structured data saved successfully: {processed_file_path}")
 
-        return {"filename": file.filename, "structured_data": structured_data}  # Return structured preview
+        # Return structured preview
+        return {"filename": file.filename, "structured_data": structured_data}
     except Exception as e:
         # Log the error for debugging
         print(f"Error uploading file: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Internal Server Error: {e}"
+        )

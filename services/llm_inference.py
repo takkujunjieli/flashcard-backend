@@ -2,7 +2,8 @@ import json
 import requests
 from pathlib import Path
 import yaml
-from core.database import save_flashcard
+import os
+# from core.database import save_flashcard
 
 # Load configuration
 with open("config.yaml", "r") as config_file:
@@ -10,25 +11,32 @@ with open("config.yaml", "r") as config_file:
 
 API_KEY = config["api_key"]
 MODEL_SERVER_BASE_URL = config["model_server_base_url"]
+SLUG = config["workspace_slug"]
 
 PROCESSED_FOLDER = Path("./processed")  # Path where structured JSON is stored
+
 
 def run_llama3_inference(prompt):
     """
     Runs inference using the AnythingLLM API.
     """
-    url = f"{MODEL_SERVER_BASE_URL}/inference"
+    url = f"{MODEL_SERVER_BASE_URL}/workspace/{SLUG}/chat"
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
         "Authorization": "Bearer " + API_KEY
     }
     payload = {
-        "prompt": prompt
+        "message": prompt,
+        "mode": "chat",
+        "sessionId": "flashcard-session",
+        "attachments": [],
     }
 
     try:
         response = requests.post(url, headers=headers, json=payload)
+        text_response = response.json()['textResponse']
+        print(f"Response : {text_response}")
         response.raise_for_status()
         output = response.json()
         return output.get("generated_text", "")
@@ -37,12 +45,13 @@ def run_llama3_inference(prompt):
     except json.JSONDecodeError:
         return "Error in inference output."
 
+
 def cleanup_json_file(filename):
     """
     Deletes the processed JSON file after flashcards have been generated successfully.
     """
     processed_file_path = PROCESSED_FOLDER / f"{filename}.json"
-    
+
     if processed_file_path.exists():
         try:
             os.remove(processed_file_path)
@@ -50,13 +59,14 @@ def cleanup_json_file(filename):
         except Exception as e:
             print(f"Error deleting JSON file: {processed_file_path} - {str(e)}")
 
+
 def efficient_flashcard_generation(filename):
     """
     Generates flashcards using pre-extracted structured text.
     Implements a fallback mechanism to prevent JSON deletion if generation fails.
     """
     processed_file_path = PROCESSED_FOLDER / f"{filename}.json"
-    
+
     if not processed_file_path.exists():
         return {"error": "Processed file not found. Please upload again."}
 
@@ -92,7 +102,7 @@ def efficient_flashcard_generation(filename):
                     keywords = section.get('keywords', [])
                     terminology = section.get('terminology', [])
 
-                    save_flashcard(question, answer, terminology, keywords)
+                    # save_flashcard(question, answer, terminology, keywords)
 
                     flashcards.append({
                         "question": question,
