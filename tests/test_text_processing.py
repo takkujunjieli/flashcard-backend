@@ -1,12 +1,12 @@
 import unittest
 from pathlib import Path
-from services.text_processing import extract_text_with_hierarchy, extract_keywords, extract_entities, preprocess_text
+from services.text_processing import extract_text_with_pypdf2, extract_keywords, extract_entities, preprocess_text
 
 class TestTextProcessing(unittest.TestCase):
 
     def setUp(self):
         # Set up the path to the existing PDF file for testing
-        self.sample_pdf_path = Path("./MMT.pdf")
+        self.sample_pdf_path = Path("./sample.pdf")
         self.sample_text = """
         Introduction
         This is a sample document for testing purposes.
@@ -23,10 +23,10 @@ class TestTextProcessing(unittest.TestCase):
         Ocasio-Cortez—drew attention to it because its tenets conformed to their policy views. 
         """
 
-    def test_extract_text_with_hierarchy(self):
-        sections = extract_text_with_hierarchy(self.sample_pdf_path)
+    def test_extract_text_with_pypdf2(self):
+        sections = extract_text_with_pypdf2(self.sample_pdf_path)
         self.assertGreater(len(sections), 0)  # Ensure that sections are extracted
-        # Add more specific assertions based on the actual content of MMT.pdf
+        # Add more specific assertions based on the actual content of sample.pdf
 
     def test_extract_keywords(self):
         keywords = extract_keywords(self.sample_text)
@@ -43,7 +43,7 @@ class TestTextProcessing(unittest.TestCase):
     def test_preprocess_text(self):
         processed_sections = preprocess_text(self.sample_pdf_path)
         self.assertGreater(len(processed_sections), 0)  # Ensure that sections are processed
-        # Add more specific assertions based on the actual content of MMT.pdf
+        # Add more specific assertions based on the actual content of sample.pdf
 
 if __name__ == "__main__":
     unittest.main()

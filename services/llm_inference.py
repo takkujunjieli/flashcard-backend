@@ -101,11 +101,14 @@ def efficient_flashcard_generation(filename, userPrompt):
         for section in structured_text:
             prompt = f"""
             {first_sentence}
-            Each Q&A pair should address one keyword from the content. Ensure that both the question and answer are concise,
-            with a word limit of less than 30 words each.
-
             Section: {section['section_title']}
             Content: {', '.join(section['content'])}
+            keywords: {section.get('keywords', [])}
+            terminology: {section.get('terminology', [])}
+
+
+            Each Q&A pair should address one keyword from the content. Ensure that both the question and answer are concise,
+            with a word limit of less than 30 words each.
 
             {userPrompt}
             """

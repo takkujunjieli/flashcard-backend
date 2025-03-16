@@ -1,10 +1,16 @@
 import re
-# import json
 from PyPDF2 import PdfReader
 from pathlib import Path
+from keybert import KeyBERT
+import spacy
 
 PROCESSED_FOLDER = Path("./processed")
 
+# Initialize KeyBERT model
+kw_model = KeyBERT()
+
+# Load spaCy model
+nlp = spacy.load("en_core_web_sm")
 
 def extract_text_with_pypdf2(pdf_path):
     """
@@ -48,7 +54,6 @@ def extract_text_with_pypdf2(pdf_path):
 
     return sections
 
-
 def preprocess_text(pdf_path):
     """
     Extracts structured sections, keywords, and terminology from a PDF file using PyPDF2.
@@ -60,8 +65,8 @@ def preprocess_text(pdf_path):
         for section in structured_data:
             section_title = section[0]
             content = section[1]
-            keywords = []  # Add logic to extract keywords if needed
-            terminology = []  # Add logic to extract terminology if needed
+            keywords = extract_keywords(" ".join(content))
+            terminology = extract_entities(" ".join(content))
 
             processed_sections.append({
                 "section_title": section_title,
@@ -77,23 +82,20 @@ def preprocess_text(pdf_path):
         print(f"Error processing text: {e}")
         raise
 
+def extract_keywords(text):
+    """
+    Extracts key phrases from text using KeyBERT.
+    """
+    keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 2), stop_words='english')
+    return [kw[0] for kw in keywords[:5]]
 
-# def extract_keywords(text):
-#     """
-#     Extracts key phrases from text using KeyBERT.
-#     """
-#     keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1,2), stop_words='english')
-#     return [kw[0] for kw in keywords[:5]]
+def extract_entities(text):
+    """
+    Extracts named entities (ORG, PERSON, GPE, PRODUCT) using spaCy.
+    """
+    doc = nlp(text)
+    return list(set(ent.text for ent in doc.ents if ent.label_ in ["ORG", "PERSON", "GPE", "PRODUCT"]))
 
-
-# def extract_entities(text):
-#     """
-#     Extracts named entities (ORG, PERSON, GPE, PRODUCT) using spaCy.
-#     """
-#     doc = nlp(text)
-#     return list(set(ent.text for ent in doc.ents if ent.label_ in ["ORG", "PERSON", "GPE", "PRODUCT"]))
-
-
-# def extract_text(file_path):
-#     with open(file_path, "r", encoding="utf-8") as f:
-#         return f.read()
+def extract_text(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
