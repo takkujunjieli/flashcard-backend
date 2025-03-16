@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from api.endpoints import inference, flashcards, upload
+import uvicorn
 
 app = FastAPI()
 
@@ -16,8 +17,5 @@ from core.database import init_db
 
 init_db()
 
-print("This works!")
-
 if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host="localhost", port=1111)
+    uvicorn.run(app, host="127.0.0.1", port=1111)
